@@ -1,0 +1,32 @@
+dhaka-sells-bd/
+├── prisma/
+│   ├── schema.prisma         # Database schema
+│   └── seed.ts               # Secure admin generator
+├── src/
+│   ├── app/
+│   │   ├── (shop)/           # Public Customer Routes
+│   │   │   ├── page.tsx      # Homepage
+│   │   │   ├── shop/         # Product listing
+│   │   │   ├── product/[id]/ # Product details
+│   │   │   ├── cart/         # Cart page
+│   │   │   └── checkout/     # Multi-step checkout
+│   │   ├── admin/            # Protected Admin Routes
+│   │   │   ├── layout.tsx    # Admin sidebar & auth check
+│   │   │   ├── page.tsx      # Dashboard analytics
+│   │   │   └── products/     # Product CRUD
+│   │   └── api/              # Backend API Routes
+│   │       ├── auth/         # NextAuth endpoints
+│   │       ├── checkout/     # Payment & Order creation
+│   │       └── admin/        # Protected admin APIs
+│   ├── components/
+│   │   ├── ui/               # Reusable UI (Buttons, Inputs)
+│   │   ├── shop/             # ProductCard, CartDrawer, Header
+│   │   └── admin/            # Admin Tables, Charts
+│   ├── lib/
+│   │   ├── prisma.ts         # DB Client
+│   │   ├── auth.ts           # NextAuth Config
+│   │   └── store/            # Zustand stores (useCart.ts)
+│   └── types/                # TypeScript interfaces
+├── .env.example
+├── package.json
+└── tailwind.config.ts

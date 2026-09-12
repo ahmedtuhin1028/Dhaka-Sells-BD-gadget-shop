@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  COD
+  BKASH
+  NAGAD
+  SSLCOMMERZ
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String
+  phone         String?
+  role          Role      @default(USER)
+  address       String?
+  city          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  reviews       Review[]
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique // e.g., Earbuds, Smart Watches
+  slug        String    @unique
+  image       String?
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id              String         @id @default(uuid())
+  name            String
+  slug            String         @unique
+  sku             String         @unique
+  description     String
+  shortDesc       String?
+  price           Float
+  salePrice       Float?
+  costPrice       Float?         // Admin only
+  stock           Int            @default(0)
+  categoryId      String
+  category        Category       @relation(fields: [categoryId], references: [id])
+  images          ProductImage[]
+  isFeatured      Boolean        @default(false)
+  isActive        Boolean        @default(true)
+  orderItems      OrderItem[]
+  reviews         Review[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  url       String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  orderNumber   String        @unique // e.g., DSBD-10025
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id])
+  
+  // Checkout Details
+  customerName  String
+  customerPhone String
+  shippingAddress String
+  city          String
+  deliveryNotes String?
+
+  // Financials
+  subTotal      Float
+  deliveryFee   Float
+  discount      Float         @default(0)
+  total         Float
+
+  // Status
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+  transactionId String?
+
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float   // Price at time of purchase
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      @default(5)
+  comment   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+}
